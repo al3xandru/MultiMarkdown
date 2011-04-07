@@ -1074,7 +1074,7 @@ sub _DoHeaders {
 			}
             # alex:attributes
             my $tag_name = "h" . $h_level;
-            my $attributes = _DoAttributes($2, $tag_name);            
+            my $attributes = _DoAttributes2($2, $tag_name);            
 			$header = _RunSpanGamut($2);
 			$header =~ s/^\s*//s;
 			
@@ -1425,7 +1425,7 @@ sub _DoBlockQuotes {
 			my $bq = $1;
 			$bq =~ s/^[ \t]*>[ \t]?//gm;	# trim one level of quoting
 			$bq =~ s/^[ \t]+$//mg;			# trim whitespace-only lines
-            my $attributes = _DoAttributes($bq, "bq");
+            my $attributes = _DoAttributes2($bq, "bq");
 			$bq = _RunBlockGamut($bq);		# recurse
 
 			$bq =~ s/^/  /g;
@@ -1464,7 +1464,7 @@ sub _FormParagraphs {
 	#
 	foreach (@grafs) {
 		unless (defined( $g_html_blocks{$_} )) {
-            $attributes = _DoAttributes($_, "p");
+            my $attributes = _DoAttributes2($_, "p");
 			$_ = _RunSpanGamut($_);
 			s/^([ \t]*)/<p$attributes>/;
 			$_ .= "</p>";
@@ -1594,7 +1594,7 @@ sub _DoAutoLinks {
 	return $text;
 }
 
-sub _DoAttributes {
+sub _DoAttributes2 {
     my $text = shift;
     my $el_name = shift;
     if ($text =~ /\[(\.\.|\.|\?|!|:|;)\]\(\s*"\{\{$el_name:([^"]+)\}\}"\)/m) {
