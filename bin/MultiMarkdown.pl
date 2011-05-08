@@ -782,7 +782,7 @@ sub _DoAnchors {
 		my $url	  		= $3;
 		my $title		= $6;
 
-        # alex: attributes
+        # alex:attributes
         
         if ( ($link_text =~ /(\.\.|\.|\?|!|:|;)/) && !$url ) {
             if ( $link_text eq ".." ) {
@@ -1425,6 +1425,7 @@ sub _DoBlockQuotes {
 			my $bq = $1;
 			$bq =~ s/^[ \t]*>[ \t]?//gm;	# trim one level of quoting
 			$bq =~ s/^[ \t]+$//mg;			# trim whitespace-only lines
+            # alex:attributes
             my $attributes = _DoAttributes2($bq, "bq");
 			$bq = _RunBlockGamut($bq);		# recurse
 
@@ -1438,6 +1439,7 @@ sub _DoBlockQuotes {
 					$pre;
 				}egsx;
 
+            # alex:attributes
 			"<blockquote$attributes>\n$bq\n</blockquote>\n\n";
 		}egmx;
 
@@ -1464,6 +1466,7 @@ sub _FormParagraphs {
 	#
 	foreach (@grafs) {
 		unless (defined( $g_html_blocks{$_} )) {
+            # alex:attributes
             my $attributes = _DoAttributes2($_, "p");
 			$_ = _RunSpanGamut($_);
 			s/^([ \t]*)/<p$attributes>/;
@@ -1594,6 +1597,7 @@ sub _DoAutoLinks {
 	return $text;
 }
 
+# alex:attributes
 sub _DoAttributes2 {
     my $text = shift;
     my $el_name = shift;
@@ -1958,7 +1962,7 @@ sub xhtmlMetaData {
 	# This screws up xsltproc - make sure to use `-nonet -novalid` if you
 	#	have difficulty
 	if ($g_allow_mathml) {
-		 $result .= qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"\n\t"http://www.w3.org/TR/2001/REC-MathML2-20010221/dtd/xhtml-math11-f.dtd">
+		 $result .= qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"\n\t"http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd">
 \n};
 	
 		$result.= qq{<html xmlns="http://www.w3.org/1999/xhtml">\n\t<head>\n};
