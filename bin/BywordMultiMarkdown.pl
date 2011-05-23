@@ -1964,7 +1964,7 @@ sub xhtmlMetaData {
 	# This screws up xsltproc - make sure to use `-nonet -novalid` if you
 	#	have difficulty
 	if ($g_allow_mathml) {
-		 $result .= qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"\n\t"http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd">
+		 $result .= qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"\n\t"http://www.w3.org/TR/2001/REC-MathML2-20010221/dtd/xhtml-math11-f.dtd">
 \n};
 	
 		$result.= qq{<html xmlns="http://www.w3.org/1999/xhtml">\n\t<head>\n};
@@ -1974,7 +1974,7 @@ sub xhtmlMetaData {
 		$result.= qq!<html xmlns="http://www.w3.org/1999/xhtml">\n\t<head>\n!;
 	}
 	
-	$result.= "\t\t<!-- Processed by MultiMarkdown -->\n";
+	#$result.= "\t\t<!-- Processed by MultiMarkdown -->\n";
 	
 	foreach my $key (sort keys %g_metadata ) {
 		# Strip trailing spaces
