@@ -1,1 +1,0 @@
-/Applications/Byword.app/Contents/Resources/MultiMarkdown/bin/MultiMarkdown.pl
