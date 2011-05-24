@@ -1,1 +1,0 @@
-/Applications/nvALT.app/Contents/Resources/MultiMarkdown/bin/MultiMarkdown.pl

@@ -91,9 +91,7 @@ $g_nested_brackets = qr{
 # Doesn't allow for whitespace, because we're using it to match URLs:
 $g_nested_parens = qr{
 	(?> 								# Atomic matching
-    # original [^()\s]+							# Anything other than parens or whitespace
-    # alex:attributes
-	   [^()'"\s]+							# Anything other than parens or whitespace
+	   [^()\s]+							# Anything other than parens or whitespace
 	 | 
 	   \(
 		 (??{ $g_nested_parens })		# Recursive set of nested brackets
@@ -799,36 +797,19 @@ sub _DoAnchors {
 		my $url	  		= $3;
 		my $title		= $6;
 
-        # alex:attributes
-        
-        if ( ($link_text =~ /(\.\.|\.|\?|!|:|;)/) && !$url ) {
-            if ( $link_text eq ".." ) {
-                $result = "";
-            } else {
-                $result = $1;
-            }
-        } else {
-            $url =~ s! \* !$g_escape_table{'*'}!gx;		# We've got to encode these to avoid
-            $url =~ s!  _ !$g_escape_table{'_'}!gx;		# conflicting with italics/bold.
-            $url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
-            $result = "<a href=\"$url\"";
+		$url =~ s! \* !$g_escape_table{'*'}!gx;		# We've got to encode these to avoid
+		$url =~ s!  _ !$g_escape_table{'_'}!gx;		# conflicting with italics/bold.
+		$url =~ s{^<(.*)>$}{$1};					# Remove <>'s surrounding URL, if present
+		$result = "<a href=\"$url\"";
 
-            if (defined $title) {
-               if ( $title =~ /({{(.+)}})/ ) {
-                    my $attributes = _DecodeAttributes($2);
-                    $title = $`;
-                    $result .= " $attributes" if $attributes;
-                }
-	    		if ( $title ) {                
-                    $title =~ s/"/&quot;/g;
-                    $title =~ s! \* !$g_escape_table{'*'}!gx;
-                    $title =~ s!  _ !$g_escape_table{'_'}!gx;
-                    $result .=  " title=\"$title\"";
-                }
-            }
-            $result .= ">$link_text</a>";
-        }
-        
+		if (defined $title) {
+			$title =~ s/"/&quot;/g;
+			$title =~ s! \* !$g_escape_table{'*'}!gx;
+			$title =~ s!  _ !$g_escape_table{'_'}!gx;
+			$result .=  " title=\"$title\"";
+		}
+		$result .= ">$link_text</a>";
+
 		$result;
 	}xsge;
 
@@ -1006,11 +987,6 @@ sub _DoImages {
 			
 		$result = "<img id=\"$label\" src=\"$url\" alt=\"$alt_text\"";
 		if (defined $title) {
-            if ( $title =~ /({{(.+)}})/ ) {
-                my $attributes = _DecodeAttributes($2);
-                $title = $`;
-                $result .= " $attributes" if $attributes;
-            }            
 			$title =~ s! \* !$g_escape_table{'*'}!gx;
 			$title =~ s!  _ !$g_escape_table{'_'}!gx;
 			$result .=  " title=\"$title\"";
@@ -1104,9 +1080,6 @@ sub _DoHeaders {
 			} else {
 				$label = Header2Label($2);
 			}
-            # alex:attributes
-            my $tag_name = "h" . $h_level;
-            my $attributes = _DoAttributes2($2, $tag_name);            
 			$header = _RunSpanGamut($2);
 			$header =~ s/^\s*//s;
 			
@@ -1118,7 +1091,7 @@ sub _DoHeaders {
 				$idString = "";
 			}
 
-			"<h$h_level$idString$attributes>"  .  $header  .  "</h$h_level>\n\n";
+			"<h$h_level$idString>"  .  $header  .  "</h$h_level>\n\n";
 		}egmx;
 
 	return $text;
@@ -1457,8 +1430,6 @@ sub _DoBlockQuotes {
 			my $bq = $1;
 			$bq =~ s/^[ \t]*>[ \t]?//gm;	# trim one level of quoting
 			$bq =~ s/^[ \t]+$//mg;			# trim whitespace-only lines
-            # alex:attributes
-            my $attributes = _DoAttributes2($bq, "bq");
 			$bq = _RunBlockGamut($bq);		# recurse
 
 			$bq =~ s/^/  /g;
@@ -1471,8 +1442,7 @@ sub _DoBlockQuotes {
 					$pre;
 				}egsx;
 
-            # alex:attributes
-			"<blockquote$attributes>\n$bq\n</blockquote>\n\n";
+			"<blockquote>\n$bq\n</blockquote>\n\n";
 		}egmx;
 
 
@@ -1498,10 +1468,8 @@ sub _FormParagraphs {
 	#
 	foreach (@grafs) {
 		unless (defined( $g_html_blocks{$_} )) {
-            # alex:attributes
-            my $attributes = _DoAttributes2($_, "p");
 			$_ = _RunSpanGamut($_);
-			s/^([ \t]*)/<p$attributes>/;
+			s/^([ \t]*)/<p>/;
 			$_ .= "</p>";
 		}
 	}
@@ -1627,46 +1595,6 @@ sub _DoAutoLinks {
 	}egix;
 
 	return $text;
-}
-
-# alex:attributes
-sub _DoAttributes2 {
-    my $text = shift;
-    my $el_name = shift;
-    if ($text =~ /\[(\.\.|\.|\?|!|:|;)\]\(\s*"\{\{$el_name:([^"]+)\}\}"\)/m) {
-        return _DecodeAttributes($2);
-    }
-    return "";
-}
-
-
-sub _DecodeAttributes {
-    my $text = shift;
-    my @matches = ( $text =~ /(#[a-zA-Z0-9_-]+|[a-zA-Z0-9_-]+='[^']+'|[a-zA-Z0-9_-]+=\S+|[a-zA-Z0-9_-]+)/g );
-    my @attributes = ();
-    my @classes = ();
-
-    foreach (@matches) {
-        if ( /^#(.+)/ ) {
-            push(@attributes, "id=\"$1\"");
-        } elsif ( /([a-zA-Z0-9_-]+)='(.+)'/ ) {
-            push(@attributes, "$1=\"$2\"");
-        } elsif ( /([a-zA-Z0-9_-]+)=(.+)/) {
-            push(@attributes, "$1=\"$2\"");
-        } else {
-            push(@classes, $_);
-        }
-    }
-
-    my $attr_str = "";
-    $attr_str = join(" ", @attributes) if @attributes;
-    $attr_str = $attr_str . " class=\"" . join(" ", @classes) . "\"" if @classes;
-    $attr_str =~ s/^\s+//;
-    $attr_str =~ s/\s+$//;
-    if ( $attr_str ) {
-        $attr_str = " $attr_str";
-    }
-    return $attr_str;
 }
 
 
