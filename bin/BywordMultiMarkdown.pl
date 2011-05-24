@@ -786,7 +786,7 @@ sub _DoAnchors {
 
         # alex:attributes
         
-        if ( ($link_text =~ /(\.\.|\.|\?|!|:|;)/) && !$url ) {
+        if ( ($link_text =~ /(\.{1,2}|\?|!|:|;)/) && !$url ) {
             if ( $link_text eq ".." ) {
                 $result = "";
             } else {
@@ -1603,7 +1603,7 @@ sub _DoAutoLinks {
 sub _DoAttributes2 {
     my $text = shift;
     my $el_name = shift;
-    if ($text =~ /\[(\.\.|\.|\?|!|:|;)\]\(\s*"\{\{$el_name:([^"]+)\}\}"\)/m) {
+    if ($text =~ /\[(\.{1,2}|\?|!|:|;)\]\(\s*"\{\{$el_name:([^"]+)\}\}"\)/m) {
         return _DecodeAttributes($2);
     }
     return "";
@@ -1964,7 +1964,7 @@ sub xhtmlMetaData {
 	# This screws up xsltproc - make sure to use `-nonet -novalid` if you
 	#	have difficulty
 	if ($g_allow_mathml) {
-		 $result .= qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"\n\t"http://www.w3.org/TR/2001/REC-MathML2-20010221/dtd/xhtml-math11-f.dtd">
+		 $result .= qq{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"\n\t"http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd">
 \n};
 	
 		$result.= qq{<html xmlns="http://www.w3.org/1999/xhtml">\n\t<head>\n};

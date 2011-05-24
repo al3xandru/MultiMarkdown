@@ -786,7 +786,7 @@ sub _DoAnchors {
 
         # alex:attributes
         
-        if ( ($link_text =~ /(\.\.|\.|\?|!|:|;)/) && !$url ) {
+        if ( ($link_text =~ /(\.{1,2}|\?|!|:|;)/) && !$url ) {
             if ( $link_text eq ".." ) {
                 $result = "";
             } else {
@@ -1603,7 +1603,7 @@ sub _DoAutoLinks {
 sub _DoAttributes2 {
     my $text = shift;
     my $el_name = shift;
-    if ($text =~ /\[(\.\.|\.|\?|!|:|;)\]\(\s*"\{\{$el_name:([^"]+)\}\}"\)/m) {
+    if ($text =~ /\[(\.{1,2}|\?|!|:|;)\]\(\s*"\{\{$el_name:([^"]+)\}\}"\)/m) {
         return _DecodeAttributes($2);
     }
     return "";
